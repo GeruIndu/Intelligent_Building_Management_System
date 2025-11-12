@@ -19,13 +19,19 @@ const userRoutes = require('./routes/users');
 const floorRoutes = require('./routes/floors');
 const spaceRoutes = require('./routes/spaces');
 const accessLogRoutes = require('./routes/accessLogs');
+const permissionRoutes = require('./routes/permissions');
+const { startCloseStaleLogs } = require('./cron/close-stale-logs');
+const dashboardRoutes = require('./routes/dashboard');
 
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/floors', floorRoutes);
 app.use('/api/spaces', spaceRoutes);
 app.use('/api/access-logs', accessLogRoutes);
+app.use('/api/permissions', permissionRoutes);
 
+startCloseStaleLogs({ intervalSchedule: '*/1 * * * *', idleSeconds: 120 }); // every 1 min, 2 min idle
 
 app.get('/', (req, res) => res.send('IBMS backend running'));
 
