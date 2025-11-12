@@ -14,13 +14,18 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('Mongo connected'))
     .catch(err => console.error(err));
 
-// simple auth route (register/login) — omit full code for brevity.
-// import routes:
-const deviceRoutes = require('./routes/devices');
-const readingRoutes = require('./routes/readings');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const floorRoutes = require('./routes/floors');
+const spaceRoutes = require('./routes/spaces');
+const accessLogRoutes = require('./routes/accessLogs');
 
-app.use('/api/devices', deviceRoutes);
-app.use('/api/readings', readingRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/floors', floorRoutes);
+app.use('/api/spaces', spaceRoutes);
+app.use('/api/access-logs', accessLogRoutes);
+
 
 app.get('/', (req, res) => res.send('IBMS backend running'));
 

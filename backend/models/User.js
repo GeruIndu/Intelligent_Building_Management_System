@@ -1,12 +1,21 @@
 // models/User.js
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String
+    },
     email: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true
     },
-    passwordHash: String,
+    contact: {
+        type: String
+    },
+    passwordHash: {
+        type: String,
+        required: true
+    },
     role: {
         type: String,
         enum: ['admin', 'manager', 'user'],
