@@ -1,0 +1,90 @@
+/* Navigation Bar Styling */
+.app-nav {
+    /* Fixed position at the top */
+    position: fixed;
+    top: 0px;
+    left: 0;
+    width: 96.5%;
+    height: 10vh;
+    /* Look and Feel */
+    background-color: #1e3a8a; /* Deep primary blue */
+    color: white;
+    padding: 10px 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it stays above other content */
+    font-family: Arial, sans-serif;
+    
+    /* Layout */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Left Section: Logo/Title */
+.nav-left a {
+    font-size: 24px;
+    font-weight: 700;
+    color: white; /* Title/Logo color */
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+}
+
+.nav-left a:hover {
+    color: #93c5fd; /* Light blue on hover */
+}
+
+/* Right Section: Links and User Info */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Spacing between links/elements */
+}
+
+/* Styling for all Links */
+.nav-right a {
+    color: #bfdbfe; /* Lighter blue/gray for links */
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 5px 0;
+    transition: color 0.2s, border-bottom 0.2s;
+    white-space: nowrap; /* Prevents links from breaking */
+}
+
+.nav-right a:hover {
+    color: white;
+    /* Subtle underline effect */
+    border-bottom: 2px solid white; 
+}
+
+/* User Greeting Text */
+.nav-user {
+    color: #dbeafe; /* Very light blue for user name */
+    font-size: 15px;
+    font-weight: 500;
+    margin-right: -10px; /* Pull the user name closer to the logout button */
+    white-space: nowrap;
+}
+
+/* Button Styling (Assuming btn and small classes exist, but enhancing them) */
+.nav-right .btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+    background-color: #22c55e; /* Green for action/logout */
+    color: white;
+    font-size: 14px; /* Default button font size */
+}
+
+.nav-right .btn.small {
+    padding: 6px 12px; /* Smaller padding for a compact look */
+    font-size: 14px;
+}
+
+.nav-right .btn:hover {
+    background-color: #15803d; /* Darker green on hover */
+}

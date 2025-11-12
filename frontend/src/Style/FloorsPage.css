@@ -1,0 +1,180 @@
+/* --- Page Layout and Typography --- */
+.floors-container {
+    padding: 30px;
+    max-width: 1200px; /* Limit width for readability */
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 50px;
+
+}
+
+.floors-container h2 {
+    font-size: 32px;
+    color: #1e3a8a; /* Dark blue primary color */
+    margin-bottom: 25px;
+    border-bottom: 3px solid #eff6ff;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+.floors-container h3 {
+    font-size: 22px;
+    color: #374151;
+    margin: 30px 0 15px;
+    font-weight: 600;
+}
+
+/* --- Card Style (Used for Form and Table containers) --- */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+/* --- Alerts/Error Messages --- */
+.alert.error {
+    padding: 15px;
+    background-color: #fee2e2; /* Light red */
+    color: #991b1b; /* Dark red */
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* --- Creation Form Styles (form-inline) --- */
+.form-inline {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.form-inline input[type="text"] {
+    flex-grow: 1; /* Inputs take up available space */
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-inline input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    outline: none;
+}
+
+/* --- Button Styles --- */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, opacity 0.2s;
+    font-size: 16px;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+/* Primary Button (Create) */
+.btn.primary {
+    background-color: #2563eb; /* Blue */
+    color: white;
+}
+.btn.primary:hover {
+    background-color: #1d4ed8;
+}
+
+/* Danger Button (Delete) */
+.btn.danger {
+    background-color: #ef4444; /* Red */
+    color: white;
+}
+.btn.danger:hover {
+    background-color: #dc2626;
+}
+
+/* Small Button (for Table Actions) */
+.btn.small {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+/* --- Table Styles --- */
+.table-wrapper {
+    overflow-x: auto; /* Ensures table is scrollable on small screens */
+    padding: 0; /* Remove padding from card to make table edges clean */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Minimum width for the table */
+}
+
+.table thead tr {
+    background-color: #f3f4f6; /* Light gray header */
+    color: #4b5563;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table th {
+    padding: 15px 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb; /* Subtle highlight on row hover */
+}
+
+/* Action Column Alignment */
+.table .action-column {
+    text-align: right;
+    width: 150px; /* Allocate fixed width for actions */
+}
+
+.table td:last-child {
+    text-align: right;
+}
+
+/* No Data Row */
+.table .no-data {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .floors-container {
+        padding: 15px;
+    }
+    
+    .floors-container h2 {
+        font-size: 26px;
+    }
+    
+    .form-inline {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-inline input[type="text"],
+    .form-inline .btn {
+        width: 100%; /* Full width on small screens */
+    }
+}

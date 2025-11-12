@@ -1,0 +1,175 @@
+/* --- Page Layout and Typography --- */
+.logs-container {
+    padding: 30px;
+    max-width: 1400px; /* Wide view for detailed log data */
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 50px;
+
+}
+
+.logs-container h2 {
+    font-size: 32px;
+    color: #047857; /* Deep green for security/logs theme */
+    margin-bottom: 25px;
+    border-bottom: 3px solid #d1fae5;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+/* --- Alerts/Error Messages --- */
+.alert.error {
+    padding: 15px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* --- Card Style (Used for Log Creation/Filter) --- */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e5e7eb;
+}
+
+/* --- Form Styles (form-inline) --- */
+.form-inline {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.form-inline select {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    height: 42px;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23047857%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5.4%200-10.4%202.1-14.2%206.5C1.8%2075.2%200%2080.2%200%2085.8s1.8%2010.8%205.4%2014.2l130.4%20130.4c4%204%209.4%206.5%2015%206.5s11-2.5%2015-6.5L287%20100c4-4%206.5-9.4%206.5-15s-2.5-11-6.5-15z%22/%3E</svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 10px auto;
+    padding-right: 30px; 
+}
+
+.form-inline select:focus {
+    border-color: #047857;
+    box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.2);
+    outline: none;
+}
+
+/* --- Button Styles --- */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    font-size: 16px;
+    white-space: nowrap; 
+}
+
+/* Start Entry Button (Primary) */
+.form-inline .btn {
+    background-color: #047857;
+    color: white;
+}
+.form-inline .btn:hover {
+    background-color: #065f46;
+}
+
+/* Action Button (Small) */
+.btn.small {
+    padding: 6px 12px;
+    font-size: 14px;
+    /* Default style for Mark Exit button */
+    background-color: #f59e0b; /* Amber/Orange for action */
+    color: white;
+}
+.btn.small:hover {
+    background-color: #d97706;
+}
+
+/* --- Table Styles --- */
+.table-wrapper {
+    overflow-x: auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 0; 
+    border: 1px solid #e5e7eb;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px; /* Minimum width for the 6 columns */
+}
+
+.table thead tr {
+    background-color: #ecfdf5;
+    color: #065f46;
+    text-align: left;
+    border-bottom: 2px solid #a7f3d0;
+}
+
+.table th, .table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.table tbody tr:hover {
+    background-color: #f0fdf4;
+}
+
+/* Styling for ACTIVE (unclosed) rows */
+.log-active {
+    background-color: #fffbeb !important; /* Light yellow background */
+    border-left: 5px solid #f59e0b; /* Orange emphasis bar */
+    font-weight: 500;
+}
+.log-active td {
+    color: #b45309; /* Darker text for visibility */
+}
+
+/* Styling for CLOSED (exitTime present) rows */
+.log-closed {
+    opacity: 0.8;
+}
+
+/* Timestamp Columns */
+.table td:nth-child(3), /* Entry */
+.table td:nth-child(4), /* Last Seen */
+.table td:nth-child(5) { /* Exit */
+    font-family: monospace;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Actions Column */
+.table th:last-child {
+    text-align: center;
+    width: 100px;
+}
+.table td:last-child {
+    text-align: center;
+    padding: 8px 10px;
+}

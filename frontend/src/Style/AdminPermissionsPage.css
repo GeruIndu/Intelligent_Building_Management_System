@@ -1,0 +1,200 @@
+/* --- Page Layout and Typography --- */
+.permissions-container {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 50px;
+
+}
+
+.permissions-container h2 {
+    font-size: 32px;
+    color: #4f46e5; /* Indigo color for admin/management theme */
+    margin-bottom: 25px;
+    border-bottom: 3px solid #eef2ff;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+.permissions-container h3 {
+    font-size: 22px;
+    color: #374151;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+/* --- Alerts/Error Messages --- */
+.alert.error {
+    padding: 15px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* --- Card Style --- */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #e5e7eb;
+}
+
+/* --- Permission Grant Form Styles (form-inline) --- */
+.form-inline {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    gap: 15px;
+    align-items: center;
+}
+
+.form-inline select,
+.form-inline input[type="datetime-local"] {
+    flex-basis: 0;
+    flex-grow: 1; /* Elements take up available space */
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 16px;
+    height: 42px;
+}
+
+.form-inline select:focus,
+.form-inline input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    outline: none;
+}
+
+/* Checkbox Labels */
+.form-inline label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.form-inline input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4f46e5;
+}
+
+/* --- Button Styles --- */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    white-space: nowrap; 
+    transition: background-color 0.2s;
+}
+
+/* Grant Button (Primary) */
+.form-inline .btn {
+    background-color: #4f46e5;
+    color: white;
+    flex-grow: 0; /* Keep button size stable */
+}
+.form-inline .btn:hover {
+    background-color: #3e33c6;
+}
+
+/* Revoke Button (Danger) */
+.btn.danger {
+    background-color: #ef4444; /* Red */
+    color: white;
+}
+.btn.danger:hover {
+    background-color: #dc2626;
+}
+.btn.small {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+/* --- Table Styles --- */
+.table-wrapper {
+    overflow-x: auto;
+    padding: 0; 
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px; 
+}
+
+.table thead tr {
+    background-color: #f5f3ff;
+    color: #4338ca;
+    text-align: left;
+    border-bottom: 2px solid #ddd6fe;
+}
+
+.table th, .table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+/* Status Indicators */
+.status-yes { color: #10b981; font-weight: 600; } /* Green */
+.status-no { color: #f97316; font-weight: 600; }  /* Orange */
+.status-revoked { color: #dc2626; font-style: italic; opacity: 0.7; } /* Red */
+.status-active { color: #4f46e5; font-weight: 500; } /* Indigo */
+
+/* Highlight revoked rows */
+tr.revoked-row {
+    background-color: #fef2f2 !important;
+    opacity: 0.8;
+}
+
+/* Last column for actions */
+.table th:last-child {
+    text-align: center;
+    width: 120px;
+}
+.table td:last-child {
+    text-align: center;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .form-inline {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-inline select,
+    .form-inline input[type="datetime-local"],
+    .form-inline .btn {
+        width: 100%;
+        flex-grow: 1;
+    }
+    
+    .form-inline label {
+        justify-content: space-between;
+    }
+}

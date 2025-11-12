@@ -1,0 +1,101 @@
+/* --- Page Layout and Typography --- */
+.users-container {
+    padding: 30px;
+    max-width: 1200px; /* Optimal width for user list */
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 50px;
+
+}
+
+.users-container h2 {
+    font-size: 32px;
+    color: #4f46e5; /* A strong indigo color for administration theme */
+    margin-bottom: 25px;
+    border-bottom: 3px solid #eef2ff;
+    padding-bottom: 10px;
+    font-weight: 700;
+}
+
+/* --- Alerts/Error Messages --- */
+.alert.error {
+    padding: 15px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* --- Table Styles --- */
+.table-wrapper {
+    overflow-x: auto;
+    /* Apply card style to the table wrapper */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 0; 
+    border: 1px solid #e5e7eb;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 400px; 
+    margin-top: 0;
+}
+
+.table thead tr {
+    background-color: #f5f3ff; /* Very light indigo header */
+    color: #4338ca;
+    text-align: left;
+    border-bottom: 2px solid #ddd6fe;
+}
+
+.table th, .table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.table tbody tr:hover {
+    background-color: #fafafa; /* Subtle highlight on row hover */
+}
+
+/* Role Styling (Make Role Stand out) */
+.table td.role-cell {
+    font-weight: 600;
+}
+
+.role-admin { color: #dc2626; }    /* Red */
+.role-manager { color: #d97706; } /* Orange */
+.role-user { color: #10b981; }    /* Green */
+
+/* No Data Row */
+.table .no-data {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .users-container {
+        padding: 15px;
+    }
+    .users-container h2 {
+        font-size: 26px;
+    }
+    .table th, .table td {
+        padding: 10px 15px;
+    }
+}

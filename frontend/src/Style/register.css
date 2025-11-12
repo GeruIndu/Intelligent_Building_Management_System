@@ -1,0 +1,197 @@
+/* --- Global Reset and Page Setup --- */
+body, #root {
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Split-Screen Container --- */
+.register-page-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    margin-top: 84px;
+}
+
+/* --- Left Pane: Design and Branding --- */
+.register-left-pane {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+    text-align: center;
+    
+    /* Indigo/Purple Gradient for Registration */
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); 
+    position: relative;
+    overflow: hidden;
+}
+
+.left-content h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    font-weight: 800;
+    /* Animation: Slide in from the left */
+    animation: slideIn 1s ease-out;
+}
+
+.left-content p {
+    font-size: 18px;
+    opacity: 0.9;
+    max-width: 80;
+    line-height: 1.6;
+    animation: slideIn 1s ease-out 0.2s forwards; /* Delayed start */
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Right Pane: Registration Form --- */
+.register-right-pane {
+    flex: 1; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f9fc;
+    padding: 20px;
+    overflow-y: auto; /* Allow scrolling if the form is long */
+}
+
+/* --- Card Styling (The Form Itself) --- */
+.register-card {
+    width: 100%;
+    max-width: 450px; 
+    padding: 30px 40px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    /* Animation: Subtle scale-in */
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Heading */
+.register-card h2 {
+    text-align: center;
+    color: #4f46e5; 
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Form Elements */
+.register-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; 
+}
+
+/* Labels */
+.register-form label {
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 3px;
+    display: block; 
+    font-size: 14px;
+}
+
+/* Inputs */
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="tel"],
+.register-form input[type="password"] {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.register-form input:focus {
+    border-color: #6366f1; 
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    outline: none;
+}
+
+/* Button */
+.register-form .btn {
+    padding: 14px 20px;
+    background-color: #4f46e5; /* Primary Indigo color */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 25px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.register-form .btn:hover {
+    background-color: #3e33c6; 
+}
+
+.register-form .btn:active {
+    transform: translateY(1px);
+}
+
+/* Error Message */
+.register-form .error {
+    padding: 10px;
+    background-color: #fef2f2; 
+    color: #ef4444; 
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* Link back to login */
+.register-form .auth-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+.register-form .auth-footer p {
+    font-size: 14px; 
+    color: #6b7280;
+}
+.register-form .auth-footer a {
+    color: #4f46e5; 
+    text-decoration: none; 
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.register-form .auth-footer a:hover {
+    color: #3e33c6;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .register-page-container {
+        flex-direction: column;
+        height: auto; 
+        min-height: 100vh;
+    }
+    
+    .register-left-pane {
+        flex: none; 
+        min-height: 200px; 
+        padding: 20px;
+    }
+
+    .register-right-pane {
+        flex: none; 
+        padding: 30px 15px; 
+    }
+}

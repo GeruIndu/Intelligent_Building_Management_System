@@ -1,0 +1,172 @@
+/* src/Style/home.css */
+
+/* General */
+.home-container {
+  font-family: "Poppins", sans-serif;
+  color: #1f2937;
+  background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+  overflow-x: hidden;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.nav-buttons button {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  color: #1f2937;
+}
+
+.nav-buttons button:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.register-btn {
+  background: #2563eb;
+  color: white;
+  margin-left: 8px;
+}
+
+.register-btn:hover {
+  background: #1e40af;
+}
+
+/* Hero Section */
+.hero-section {
+    margin-top: 100px;
+    /* padding-top: 100px; */
+}
+
+.hero {
+    text-align: center;
+    padding: 100px 20px 120px;
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    color: white;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.hero span {
+  background: linear-gradient(90deg, #93c5fd, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #e0e7ff;
+}
+
+.explore-btn {
+  margin-top: 40px;
+  padding: 14px 32px;
+  background: white;
+  color: #2563eb;
+  border: none;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.explore-btn:hover {
+  background: #f3f4f6;
+}
+
+/* Features Section */
+.features {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.features h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #1e3a8a;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: #2563eb;
+}
+
+.feature-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.feature-card p {
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Footer */
+.footer {
+  background: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 60px;
+  font-size: 0.95rem;
+}
+
+.footer strong {
+  color: #93c5fd;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .navbar {
+    padding: 16px 30px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}

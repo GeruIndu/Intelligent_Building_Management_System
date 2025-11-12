@@ -1,0 +1,40 @@
+/* dashboard.css */
+.kpi-row { display:flex; gap:12px; margin-bottom:16px; }
+.kpi-card { background:#fff; padding:18px; border-radius:10px; box-shadow:0 4px 12px rgba(20,20,30,0.04); flex:1; min-width:140px; }
+.kpi-value { font-size:28px; font-weight:700; color:#1f2937; }
+.kpi-title { color:#6b7280; margin-top:6px; }
+.kpi-hint { color:#9ca3af; font-size:12px; margin-top:6px; }
+
+.grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+
+.list-compact { list-style:none; padding:0; margin:0; }
+.list-compact li { padding:8px 0; border-bottom:1px dashed #efefef; font-size:14px; }
+
+.busiest-row { display:flex; align-items:center; gap:8px; justify-content:space-between; }
+.busiest-name { font-weight:600; }
+.muted { color:#6b7280; }
+
+.sparkbar { position:relative; height:18px; background:#f3f4f6; border-radius:10px; overflow:hidden; }
+.sparkbar-fill { position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,#60a5fa,#3b82f6); }
+.sparkbar-label { position:absolute; right:8px; top:0; bottom:0; display:flex; align-items:center; color:#fff; font-size:12px; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.2); padding-right:4px; }
+
+
+.dashboard-container {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f9; /* Light, subtle background */
+    min-height: 100vh; /* Ensures content fills the viewport height */
+    margin-top: 50px;
+}
+
+/* --- Main Heading --- */
+.dashboard-container h1 {
+    font-size: 36px;
+    color: #1e3a8a; /* Dark blue primary color */
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #dbeafe;
+    font-weight: 700;
+}

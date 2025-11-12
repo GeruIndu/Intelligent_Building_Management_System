@@ -1,0 +1,191 @@
+/* --- Global Reset and Page Setup --- */
+body, #root {
+    margin: 0;
+    padding: 0;
+    /* height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden; Prevent scrolling */
+}
+
+
+/* --- Split-Screen Container --- */
+.login-page-container {
+    display: flex;
+    overflow: hidden;
+    height: 87vh;
+    margin-top: 84px;
+}
+
+/* --- Left Pane: Design and Branding --- */
+.login-left-pane {
+    flex: 1; /* Takes 50% width on large screens */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 40px;
+    text-align: center;
+    
+    /* Impressive Background Design */
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); /* Deep Blue Gradient */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Optional: Add decorative elements or an image here */
+.left-content h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.left-content p {
+    font-size: 18px;
+    opacity: 0.9;
+    max-width: 80;
+    line-height: 1.6;
+}
+
+/* --- Right Pane: Login Form --- */
+.login-right-pane {
+    flex: 1; /* Takes 50% width on large screens */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f9fc; /* Light background for contrast */
+    padding: 20px;
+}
+
+/* --- Card Styling (The Form Itself) --- */
+.login-card {
+    width: 100%;
+    max-width: 400px; 
+    padding: 10px 45px 10px 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    /* Animation: Subtle scale-in */
+    animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Heading */
+.login-card h2 {
+    text-align: center;
+    color: #1e3a8a;
+    margin-bottom: 010px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Form Elements */
+.login-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+/* Labels */
+.login-form label {
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 5px;
+    display: block; 
+    font-size: 14px;
+}
+
+/* Inputs */
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-form input:focus {
+    border-color: #3b82f6; 
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    outline: none;
+}
+
+/* Button */
+.login-form .btn {
+    padding: 14px 20px;
+    background-color: #3b82f6; /* Primary blue color */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.login-form .btn:hover {
+    background-color: #2563eb; 
+}
+
+.login-form .btn:active {
+    transform: translateY(1px);
+}
+
+/* Error Message */
+.login-form .error {
+    padding: 10px;
+    background-color: #fef2f2; 
+    color: #ef4444; 
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+
+/* Link back to login */
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+.auth-footer p {
+    font-size: 14px; 
+    color: #6b7280;
+}
+.auth-footer a {
+    color: #4f46e5; 
+    text-decoration: none; 
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.auth-footer a:hover {
+    color: #3e33c6;
+}
+
+/* --- Responsive Adjustments (for Split-Screen) --- */
+@media (max-width: 992px) {
+    .login-page-container {
+        flex-direction: column;
+        height: auto; 
+        min-height: 100vh;
+    }
+    
+    .login-left-pane {
+        flex: none; /* No fixed flex */
+        min-height: 250px; /* Smaller height on mobile/tablet */
+        padding: 20px;
+    }
+
+    .login-right-pane {
+        flex: none; 
+        padding: 30px 15px; 
+    }
+}
