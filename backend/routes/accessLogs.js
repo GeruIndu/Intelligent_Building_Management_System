@@ -9,11 +9,6 @@ const Floor = require('../models/Floor');
 const { auth, permit } = require('../middleware/auth');
 const { checkUserCanEnter } = require('../middleware/permission');
 
-/**
- * Create entry
- * Normal users: forced to create for themselves (req.user.id).
- * Admin/manager may create for any user by sending user in body.
- */
 router.post('/', auth, async (req, res) => {
     try {
         const { user: bodyUser, space, entryTime, notes } = req.body;
