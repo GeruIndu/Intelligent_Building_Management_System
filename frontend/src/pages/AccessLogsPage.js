@@ -1,16 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../api';
 import { getUser } from '../utils/auth';
-import '../Style/AccessLogsPage.css'; // Import the new CSS file
+import '../Style/AccessLogsPage.css';
 
 export default function AccessLogsPage() {
+    const me = getUser(); // { id, name, role, ... } - adjust to your getUser shape
+    const isAdmin = me?.role === 'admin' || me?.role === 'manager';
+
     const [users, setUsers] = useState([]);
     const [spaces, setSpaces] = useState([]);
     const [logs, setLogs] = useState([]);
-    const [selectedUser, setSelectedUser] = useState('');
+
+    // For admin: choose user to create entry for
+    const [selectedUser, setSelectedUser] = useState(isAdmin ? '' : (me?._id || me?.id || ''));
     const [selectedSpace, setSelectedSpace] = useState('');
     const [err, setErr] = useState('');
-    const currentLogRef = useRef(null); // store current open log object
+
+    // current open log for this actor (if any)
+    const currentLogRef = useRef(null);
     const heartbeatTimerRef = useRef(null);
     const HEARTBEAT_INTERVAL_MS = 20 * 1000; // 20s
 
@@ -21,59 +28,147 @@ export default function AccessLogsPage() {
             window.removeEventListener('beforeunload', handleBeforeUnload);
             stopHeartbeat();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Load users (admin only), spaces (server returns allowed spaces for normal user),
+    // logs (admin sees all, user sees own)
     const load = async () => {
         try {
-            const [u, s, l] = await Promise.all([api.getUsers(), api.getSpaces(), api.getLogs()]);
-            setUsers(u); setSpaces(s); setLogs(l);
-        } catch (e) { setErr(e.message); }
+            // fetch in parallel
+            const promises = [api.getSpaces(), api.getLogs()];
+            if (isAdmin) promises.unshift(api.getUsers()); // users first for admin
+            const results = await Promise.all(promises);
+
+            if (isAdmin) {
+                // results: [users, spaces, logs]
+                setUsers(results[0] || []);
+                setSpaces(results[1] || []);
+                setLogs(results[2] || []);
+            } else {
+                // results: [spaces, logs]
+                setSpaces(results[0] || []);
+                setLogs(results[1] || []);
+            }
+
+            // If a normal user has an open log (server returned in logs), set currentLogRef
+            if (!isAdmin) {
+                const open = (results[1] || []).find(l => !l.exitTime);
+                if (open) {
+                    currentLogRef.current = open;
+                    startHeartbeat();
+                } else {
+                    currentLogRef.current = null;
+                    stopHeartbeat();
+                }
+            }
+        } catch (e) {
+            console.error('Load error', e);
+            setErr(e.message || 'Failed to load data');
+        }
     };
 
     // create entry
     const createEntry = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         setErr('');
-        if (!selectedUser || !selectedSpace) return setErr('Please select a user and a space.');
+        // validation
+        if (!selectedSpace) return setErr('Please select a space.');
+        // If admin, they must also choose a user
+        if (isAdmin && !selectedUser) return setErr('Please select a user (admin).');
+
         try {
-            const saved = await api.createLog({ user: selectedUser, space: selectedSpace });
-            // saved is populated log
-            currentLogRef.current = saved;
-            startHeartbeat(); // start sending heartbeats for this log
+            let saved;
+            if (isAdmin) {
+                // admin can create on behalf of any user
+                saved = await api.createLog({ user: selectedUser, space: selectedSpace });
+            } else {
+                // normal user: server will use req.user (do not send user id from client)
+                saved = await api.createLog({ space: selectedSpace });
+            }
+
+            // saved is populated log; if the created log belongs to the current logged-in user, track it
+            const createdUserId = saved.user?._id || saved.user;
+            const myId = me?._id || me?.id || me;
+            if (String(createdUserId) === String(myId)) {
+                currentLogRef.current = saved;
+                startHeartbeat();
+            }
+
             await load();
-        } catch (e) { setErr(e.message); }
+        } catch (e) {
+            console.error('Create entry error', e);
+            setErr(e?.response?.data?.error || e.message || 'Failed to create entry');
+        }
     };
 
-    // Mark exit via API (normal fetch)
-    const markExit = async (logId) => {
+    // Mark exit (preferred: call server close endpoint by space, server will find user's open log)
+    // For admin you may want to allow target user param; here we close by passing space and optionally user (admin)
+    const markExit = async (logOrSpace, maybeSpace) => {
+        setErr('');
         try {
-            await api.updateLog(logId, { exitTime: new Date() });
-            if (currentLogRef.current && currentLogRef.current._id === logId) {
+            // If called with (logId) from earlier code, translate to space
+            // We prefer closing by space to ensure permission checks and atomic behavior on server
+            let spaceId, userForAdmin;
+            if (typeof logOrSpace === 'string' && maybeSpace === undefined) {
+                // Single arg could be logId (old usage) - find corresponding log to get space
+                const log = logs.find(x => x._id === logOrSpace);
+                spaceId = log?.space?._id || log?.space;
+                userForAdmin = log?.user?._id || log?.user;
+            } else if (logOrSpace && logOrSpace.space) {
+                // passed a log object
+                spaceId = logOrSpace.space._id || logOrSpace.space;
+                userForAdmin = logOrSpace.user?._id || logOrSpace.user;
+            } else {
+                // passed spaceId directly
+                spaceId = logOrSpace;
+            }
+
+            if (!spaceId) return setErr('Space id not available for closing.');
+
+            const payload = { space: spaceId };
+            // If admin and closing for someone else, include user in payload
+            if (isAdmin && userForAdmin) payload.user = userForAdmin;
+
+            await api.closeLog(payload);
+
+
+            // if currentLogRef matches this space, clear heartbeat
+            const cur = currentLogRef.current;
+            if (cur && (cur.space?._id || cur.space) === spaceId) {
                 currentLogRef.current = null;
                 stopHeartbeat();
             }
+
             await load();
-        } catch (e) { setErr(e.message); }
+        } catch (e) {
+            console.error('Mark exit error', e);
+            setErr(e?.response?.data?.error || e.message || 'Failed to mark exit');
+        }
     };
 
-    // Heartbeat: call API endpoint to update lastSeen
+    // Heartbeat: use access-logs/heartbeat endpoint
     const sendHeartbeat = async () => {
         try {
             const log = currentLogRef.current;
             if (!log) return;
-            // prefer using fetch directly to avoid global api wrapper differences
-            await api.heartbeat({ user: log.user._id || log.user, space: log.space._id || log.space, timestamp: new Date() });
+            const userId = log.user?._id || log.user;
+            const spaceId = log.space?._id || log.space;
+            // Normal user: server will validate req.user; for admin it's okay to send user
+            const payload = isAdmin ? { user: userId, space: spaceId, timestamp: new Date() } : { space: spaceId, timestamp: new Date() };
+            // use api.heartbeat or raw post
+            await api.heartbeat(payload);
         } catch (e) {
-            console.warn('Heartbeat error:', e.message);
+            console.warn('Heartbeat error:', e);
         }
     };
 
     const startHeartbeat = () => {
         stopHeartbeat();
-        // send immediately then schedule
-        sendHeartbeat();
+        sendHeartbeat(); // immediate
         heartbeatTimerRef.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
     };
+
     const stopHeartbeat = () => {
         if (heartbeatTimerRef.current) {
             clearInterval(heartbeatTimerRef.current);
@@ -81,62 +176,63 @@ export default function AccessLogsPage() {
         }
     };
 
-    // beforeunload: sendBeacon to close log for best-effort (synchronous-ish)
+    // beforeunload: try to close open log using sendBeacon (best-effort)
     const handleBeforeUnload = (ev) => {
         const log = currentLogRef.current;
         if (!log) return;
         try {
-            const payload = JSON.stringify({
-                user: log.user._id || log.user,
-                space: log.space._id || log.space
-            });
-            // ✅ Send as application/json Blob
-            // Ensure REACT_APP_API_BASE is correctly configured in your environment
-            const url =
-                (process.env.REACT_APP_API_BASE || 'http://localhost:3000/api') +
-                '/access-logs/close';
+            const userId = log.user?._id || log.user;
+            const spaceId = log.space?._id || log.space;
+            const payloadObj = isAdmin ? { user: userId, space: spaceId } : { space: spaceId };
+            const payload = JSON.stringify(payloadObj);
+            const url = (process.env.REACT_APP_API_BASE || 'http://localhost:5000') + '/api/access-logs/close';
+            // Note: sendBeacon expects a full url; ensure correct prefix + '/api/...'
             navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
         } catch (e) {
             console.error('sendBeacon error', e);
         }
     };
 
-    // Polling useEffect (to refresh table data periodically)
+    // Polling: refresh table data periodically
     useEffect(() => {
         const POLL_MS = 15 * 1000; // 15 seconds
         const interval = setInterval(() => {
             load();
         }, POLL_MS);
-
         return () => clearInterval(interval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-
+    // Render
     return (
-        // Use .logs-container for page wrapper
         <div className="logs-container">
             <h2>🔒 Access Logs Monitoring</h2>
 
-            {/* Use .alert.error class */}
             {err && <div className="alert error">{err}</div>}
 
-            {/* --- Log Creation Form/Filter --- */}
             <div className="card">
                 <form className="form-inline" onSubmit={createEntry}>
-                    <select value={selectedUser} onChange={e => setSelectedUser(e.target.value)} required>
-                        <option value="">Select User</option>
-                        {users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
-                    </select>
+                    {isAdmin ? (
+                        <select value={selectedUser} onChange={e => setSelectedUser(e.target.value)} required>
+                            <option value="">Select User</option>
+                            {users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
+                        </select>
+                    ) : (
+                        // show a read-only disabled field for normal users (so they know who they are acting as)
+                        <input type="text" value={me?.name || 'You'} disabled />
+                    )}
+
                     <select value={selectedSpace} onChange={e => setSelectedSpace(e.target.value)} required>
                         <option value="">Select Space</option>
-                        {spaces.map(s => <option key={s._id} value={s._id}>{s.spaceName} ({s.floor?.floornumber || 'N/A'})</option>)}
+                        {spaces.map(s => (
+                            <option key={s._id} value={s._1d || s._id}>{s.spaceName} ({s.floor?.floornumber || 'N/A'})</option>
+                        ))}
                     </select>
-                    {/* Use .btn class */}
+
                     <button className="btn primary" type="submit">Start Entry</button>
                 </form>
             </div>
 
-            {/* --- Logs Table --- */}
             <div className="table-wrapper">
                 <table className="table">
                     <thead>
@@ -156,7 +252,6 @@ export default function AccessLogsPage() {
                             logs.map(l => (
                                 <tr
                                     key={l._id}
-                                    // Highlight active logs with .log-active class
                                     className={!l.exitTime ? 'log-active' : 'log-closed'}
                                 >
                                     <td>{l.user?.name || 'N/A'}</td>
@@ -168,7 +263,7 @@ export default function AccessLogsPage() {
                                         {!l.exitTime && (
                                             <button
                                                 className="btn small"
-                                                onClick={() => markExit(l._id)}
+                                                onClick={() => markExit(l)}
                                             >
                                                 Mark Exit
                                             </button>

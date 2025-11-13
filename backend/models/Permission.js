@@ -13,6 +13,7 @@ const permissionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // optional unique index to prevent duplicates
-permissionSchema.index({ user: 1, space: 1 }, { unique: true });
+permissionSchema.index({ user: 1, space: 1 });
+permissionSchema.index({ user: 1, revoked: 1, expiresAt: 1 });
 
 module.exports = mongoose.model('Permission', permissionSchema);

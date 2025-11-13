@@ -3,42 +3,45 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const AccessLog = require('../models/AccessLog');
-const User = require('../models/User');
 const Space = require('../models/Space');
-const Floor = require('../models/Floor');
-const { auth, permit } = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const { checkUserCanEnter } = require('../middleware/permission');
 
+/**
+ * Create entry (Start Entry)
+ * - Normal users: can create only for themselves and only for spaces they have active permission for.
+ * - Admin/manager: may create on behalf of a user (optional).
+ */
 router.post('/', auth, async (req, res) => {
     try {
-        const { user: bodyUser, space, entryTime, notes } = req.body;
+        const { space, user: bodyUser, entryTime, notes } = req.body;
         if (!space) return res.status(400).json({ error: 'space is required' });
 
-        // validate space
+        // validate space exists
         const s = await Space.findById(space).populate('floor');
         if (!s) return res.status(400).json({ error: 'Invalid space' });
 
-        // determine user to create log for
+        // choose user: admins/managers may create for others; normal users only themselves
+        const actorRole = req.user.role;
         let logUser;
-        if (['admin', 'manager'].includes(req.user.role) && bodyUser) {
-            // admin explicitly creating for other user
-            if (!mongoose.Types.ObjectId.isValid(bodyUser)) return res.status(400).json({ error: 'Invalid user id' });
-            const u = await User.findById(bodyUser);
-            if (!u) return res.status(400).json({ error: 'Invalid user id' });
+        if ((actorRole === 'admin' || actorRole === 'manager') && bodyUser) {
+            if (!mongoose.Types.ObjectId.isValid(bodyUser)) return res.status(400).json({ error: 'Invalid body user id' });
             logUser = bodyUser;
         } else {
-            // force normal user to create only for themselves
             logUser = req.user.id;
         }
 
-        // permission check for non-admins (admins/managers bypass)
-        if (!['admin', 'manager'].includes(req.user.role)) {
+        // Permission check for non-admins: ensure the *target* user has permission for this space
+        if (actorRole !== 'admin' && actorRole !== 'manager') {
             const allowed = await checkUserCanEnter(logUser, space);
-            if (!allowed) return res.status(403).json({ error: 'Access denied for this space' });
+            if (!allowed) return res.status(403).json({ error: 'You do not have permission to enter this space' });
         }
 
-        // Optionally close any previous open log for same user+space to avoid duplicates
-        await AccessLog.findOneAndUpdate({ user: logUser, space, exitTime: null }, { $set: { exitTime: new Date() } });
+        // Optional: prevent multiple open logs for same user+space — close previous open one
+        await AccessLog.findOneAndUpdate(
+            { user: logUser, space, exitTime: null },
+            { $set: { exitTime: new Date() } }
+        );
 
         const log = new AccessLog({
             user: logUser,
@@ -52,9 +55,10 @@ router.post('/', auth, async (req, res) => {
 
         const saved = await log.save();
 
+        // return populated result
         const populated = await AccessLog.findById(saved._id)
-            .populate('user', 'name email contact')
-            .populate('space', 'spaceName spaceType floor')
+            .populate('user', 'name email')
+            .populate('space', 'spaceName floor')
             .populate('floor', 'floornumber');
 
         res.status(201).json(populated);
@@ -64,19 +68,29 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-/** Close (Mark Exit) */
+/**
+ * Close (Mark Exit)
+ * - Normal users: can close their own open logs for spaces they have permission for.
+ * - Admin/manager: may close logs for anyone.
+ */
 router.post('/close', auth, async (req, res) => {
     try {
-        const { user: bodyUser, space, exitTime } = req.body;
+        const { space, user: bodyUser, exitTime } = req.body;
         if (!space) return res.status(400).json({ error: 'space is required' });
 
-        let logUser;
-        if (['admin', 'manager'].includes(req.user.role) && bodyUser) logUser = bodyUser;
-        else logUser = req.user.id;
+        const actorRole = req.user.role;
+        const targetUser = (actorRole === 'admin' || actorRole === 'manager') && bodyUser ? bodyUser : req.user.id;
 
+        // Permission check for normal users — they must have permission for the space to close it
+        if (actorRole !== 'admin' && actorRole !== 'manager') {
+            const allowed = await checkUserCanEnter(targetUser, space);
+            if (!allowed) return res.status(403).json({ error: 'You do not have permission to exit this space' });
+        }
+
+        // atomic close: find latest open log for that user+space
         const now = exitTime ? new Date(exitTime) : new Date();
         const updated = await AccessLog.findOneAndUpdate(
-            { user: logUser, space, exitTime: null },
+            { user: targetUser, space, exitTime: null },
             { $set: { exitTime: now } },
             { new: true }
         )
@@ -92,23 +106,33 @@ router.post('/close', auth, async (req, res) => {
     }
 });
 
-/** Heartbeat */
+/**
+ * Heartbeat - update lastSeen on open log
+ * - Normal users: updates their own open log for the space
+ * - Admin/manager: may update for any user (optional)
+ */
 router.post('/heartbeat', auth, async (req, res) => {
     try {
-        const { user: bodyUser, space, timestamp } = req.body;
+        const { space, user: bodyUser, timestamp } = req.body;
         if (!space) return res.status(400).json({ error: 'space is required' });
 
-        let logUser = (['admin', 'manager'].includes(req.user.role) && bodyUser) ? bodyUser : req.user.id;
-        const now = timestamp ? new Date(timestamp) : new Date();
+        const actorRole = req.user.role;
+        const targetUser = (actorRole === 'admin' || actorRole === 'manager') && bodyUser ? bodyUser : req.user.id;
 
+        // Permission check for normal users
+        if (actorRole !== 'admin' && actorRole !== 'manager') {
+            const allowed = await checkUserCanEnter(targetUser, space);
+            if (!allowed) return res.status(403).json({ error: 'You do not have permission for this space' });
+        }
+
+        const now = timestamp ? new Date(timestamp) : new Date();
         const updated = await AccessLog.findOneAndUpdate(
-            { user: logUser, space, exitTime: null },
+            { user: targetUser, space, exitTime: null },
             { $set: { lastSeen: now } },
             { new: true }
         );
 
         if (!updated) return res.status(404).json({ error: 'No open access log found' });
-
         return res.json({ ok: true, lastSeen: updated.lastSeen });
     } catch (err) {
         console.error('Heartbeat error', err);
@@ -116,91 +140,38 @@ router.post('/heartbeat', auth, async (req, res) => {
     }
 });
 
-/** GET list (with safe query + role restrictions) */
+/**
+ * GET /api/access-logs
+ * - Admin/manager: returns all logs (optional filters)
+ * - Normal user: returns *only their* logs
+ */
 router.get('/', auth, async (req, res) => {
     try {
         const { user, space, floor, from, to, limit = 100 } = req.query;
         const q = {};
-        if (user) q.user = user;
-        if (space) q.space = space;
+
+        // allow query args only for admins/managers; otherwise restrict to req.user.id
+        if (req.user.role === 'admin' || req.user.role === 'manager') {
+            if (user) q.user = user;
+            if (space) q.space = space;
+        } else {
+            q.user = req.user.id;
+        }
         if (floor) q.floor = floor;
         if (from || to) q.entryTime = {};
         if (from) q.entryTime.$gte = new Date(from);
         if (to) q.entryTime.$lte = new Date(to);
 
-        if (!['admin', 'manager'].includes(req.user.role)) {
-            q.user = req.user.id;
-        }
-
         const logs = await AccessLog.find(q)
             .sort({ entryTime: -1 })
             .limit(Number(limit))
-            .populate('user', 'name email contact')
-            .populate('space', 'spaceName spaceType floor')
+            .populate('user', 'name email')
+            .populate('space', 'spaceName floor')
             .populate('floor', 'floornumber');
 
         res.json(logs);
     } catch (err) {
         console.error('Query accessLogs error', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
-/** GET single */
-router.get('/:id', auth, async (req, res) => {
-    try {
-        const log = await AccessLog.findById(req.params.id)
-            .populate('user', 'name email contact')
-            .populate('space', 'spaceName spaceType floor')
-            .populate('floor', 'floornumber');
-
-        if (!log) return res.status(404).json({ error: 'Log not found' });
-        if (String(log.user._id) !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-        res.json(log);
-    } catch (err) {
-        console.error('Get accessLog error', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
-/** Update (exitTime, notes) */
-router.put('/:id', auth, async (req, res) => {
-    try {
-        const log = await AccessLog.findById(req.params.id);
-        if (!log) return res.status(404).json({ error: 'Log not found' });
-
-        if (String(log.user) !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
-            return res.status(403).json({ error: 'Forbidden' });
-        }
-
-        const { exitTime, accessGrant, notes } = req.body;
-        if (exitTime !== undefined) log.exitTime = exitTime ? new Date(exitTime) : undefined;
-        if (accessGrant !== undefined) log.accessGrant = !!accessGrant;
-        if (notes !== undefined) log.notes = notes;
-        await log.save();
-
-        const populated = await AccessLog.findById(log._id)
-            .populate('user', 'name email contact')
-            .populate('space', 'spaceName spaceType floor')
-            .populate('floor', 'floornumber');
-
-        res.json(populated);
-    } catch (err) {
-        console.error('Update accessLog error', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
-/** Delete - admin only */
-router.delete('/:id', auth, permit('admin'), async (req, res) => {
-    try {
-        const deleted = await AccessLog.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ error: 'Log not found' });
-        res.json({ message: 'Access log deleted' });
-    } catch (err) {
-        console.error('Delete accessLog error', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

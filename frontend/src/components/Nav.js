@@ -27,7 +27,7 @@ export default function Nav() {
                     <Link className='items' to="/spaces">Spaces</Link>
                 </>
                 }{
-                    user && user?.role !== 'user' && <Link to="/access-logs">Access Logs</Link>
+                    <Link to="/access-logs">Access Logs</Link>
                 }
 
                 {/* Admin/Manager link */}
